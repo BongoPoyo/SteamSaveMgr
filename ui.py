@@ -72,7 +72,33 @@ class SteamGameView(VerticalGroup):
                 yield Label(steam_game.app_id)
                 yield Button(steam_game.game_name, id=f"SteamGame{index}", variant="primary")
             # yield Button(steam_game.game_name)
+class NonSteamGameView(VerticalGroup):
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
 
+        if not button_id:
+            return
+
+        print("PRESSED BUTTON ID ",button_id)
+
+        match = re.search(r'\d+$', button_id)
+        index = 0
+        if match:
+            index = int(match.group())
+
+        print("Index", index)
+        path = variables.non_steam_games[index].pfx_path
+        
+        subprocess.run(
+            ["xdg-open", os.path.expanduser(path)], check=False)
+
+    def compose(self) -> ComposeResult:
+        for index, non_steam_game in enumerate(variables.non_steam_games):
+            with Horizontal():
+                #yield Button(steam_game.app_id, "default", disabled=True)
+                yield Label(non_steam_game.app_id)
+                yield Button(non_steam_game.game_name, id=f"NonSteamGame{index}", variant="primary")
+ 
 
 class SaveManagerApp(App):
     CSS_PATH = "ui.css"
@@ -94,7 +120,7 @@ class SaveManagerApp(App):
             with TabPane("SteamGames", id="steam_tab"):
                 yield VerticalScroll(SteamGameView())
             with TabPane("NonSteamGames", id="non_steam_tab"):
-                yield VerticalScroll()
+                yield VerticalScroll(NonSteamGameView())
             with TabPane("LutrisGames", id="lutris_tab"):
                 yield VerticalScroll()
 
