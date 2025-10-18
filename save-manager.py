@@ -85,7 +85,9 @@ def get_pfx_paths(file, u_appid):
         path = os.path.join(file, f"steamapps/compatdata/{u_appid}")
         # print("Path: ", path)
         if os.path.exists(path):
-            pfx_paths = pfx_paths + " file://" + path
+            # for multiple paths 
+            # pfx_paths = pfx_paths + " file://" + path
+            pfx_paths = " file://" + path
 
     return pfx_paths
 

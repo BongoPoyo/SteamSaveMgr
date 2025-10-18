@@ -4,7 +4,7 @@ from textual.app import App, ComposeResult
 import os
 import re
 import variables
-from textual.containers import HorizontalGroup, VerticalScroll, VerticalGroup, Horizontal
+from textual.containers import HorizontalGroup, VerticalScroll, VerticalGroup, Horizontal, HorizontalScroll
 from textual.widgets import Button, Placeholder, Footer, Header, Label, TabPane, TabbedContent
 import subprocess
 
@@ -46,29 +46,31 @@ class DefaultPrefixesView(HorizontalGroup):
 
 
 class SteamGameView(VerticalGroup):
-    def on_button_pressedf(self, event: Button.Pressed) -> None:
+    def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
 
         if not button_id:
             return
 
-        print(button_id)
+        print("PRESSED BUTTON ID ",button_id)
 
         match = re.search(r'\d+$', button_id)
         index = 0
         if match:
             index = int(match.group())
 
-        path = variables.library_folders[index].pfx_path
+        print("Index", index)
+        path = variables.steam_games[index].pfx_path
+        
         subprocess.run(
             ["xdg-open", os.path.expanduser(path)], check=False)
 
     def compose(self) -> ComposeResult:
         for index, steam_game in enumerate(variables.steam_games):
             with Horizontal():
-                yield Button(steam_game.app_id)
-                # yield Label(steam_game.app_id),
-                yield Button(steam_game.game_name, id=f"SteamGame{index}")
+                #yield Button(steam_game.app_id, "default", disabled=True)
+                yield Label(steam_game.app_id)
+                yield Button(steam_game.game_name, id=f"SteamGame{index}", variant="primary")
             # yield Button(steam_game.game_name)
 
 

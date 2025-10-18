@@ -1,16 +1,3 @@
-Stopwatch {
-    background: $boost;
-    height: 5;
-    margin: 1;
-    min-width: 50;
-    padding: 1;
-}
-
-TimeDisplay {   
-    text-align: center;
-    color: $foreground-muted;
-    height: 3;
-}
 Tabs {
     dock: top;
 }
@@ -18,47 +5,12 @@ Screen {
     align: center middle;
 }
 Label {
-    margin:1 1;
-    width: 100%;
-    height: 100%;
     background: $panel;
+    width: 20;
     border: tall $primary;
     content-align: center middle;
 }
 Button {
-    width: 16;
+    width: 20;
 }
 
-#start {
-    dock: left;
-}
-
-#stop {
-    dock: left;
-    display: none;
-}
-
-#reset {
-    dock: right;
-}
-
-.started {
-    background: $success-muted;
-    color: $text;
-}
-
-.started TimeDisplay {
-    color: $foreground;
-}
-
-.started #start {
-    display: none
-}
-
-.started #stop {
-    display: block
-}
-
-.started #reset {
-    visibility: hidden
-}
