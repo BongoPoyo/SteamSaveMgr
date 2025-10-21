@@ -1,3 +1,6 @@
+from textual.widgets import Placeholder
+from textual.screen import Screen
+from textual.containers import HorizontalScroll, VerticalScroll
 from textual.reactive import reactive
 from time import monotonic
 from textual.app import App, ComposeResult
@@ -43,7 +46,7 @@ class DefaultPrefixesView(HorizontalGroup):
 
         for key, value in variables.library_data['libraryfolders'].items():
             yield Button("Steam Library " + key, id=f"library{key}")
-            yield DirectoryTree(key)
+            # yield DirectoryTree(key)
 
 
 class SteamGameView(VerticalGroup):
@@ -72,7 +75,7 @@ class SteamGameView(VerticalGroup):
                 # yield Button(steam_game.app_id, "default", disabled=True)
                 yield Label(steam_game.app_id)
                 yield Button(steam_game.game_name, id=f"SteamGame{index}", variant="primary")
-            # yield Button(steam_game.game_name)
+                # yield Button(steam_game.game_name)
 
 
 class NonSteamGameView(VerticalGroup):
@@ -100,11 +103,11 @@ class NonSteamGameView(VerticalGroup):
             with Horizontal():
                 # yield Button(steam_game.app_id, "default", disabled=True)
                 yield Label(non_steam_game.app_id)
-                yield Button(non_steam_game.game_name, id=f"NonSteamGame{index}", variant="primary")
+               # yield Button(non_steam_game.game_name, id=f"NonSteamGame{index}", variant="primary")
 
 
 class SaveManagerApp(App):
-    CSS_PATH = "ui.css"
+    # CSS_PATH = "ui.css"
 
     BINDINGS = [("q", "quit", "Quit app"),
                 ("1", "default_tab", "Default Tab"),

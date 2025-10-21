@@ -262,6 +262,8 @@ layout["right"].split_column(
 layout["left"].size = 50
 print(layout)
 print(lutris_games_renderable)
-# if __name__ == "__main__":
-# app = ui.SaveManagerApp()
-# app.run()
+
+
+if __name__ == "__main__":
+    app = ui.SaveManagerApp()
+    app.run()
