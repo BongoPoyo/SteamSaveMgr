@@ -10,8 +10,10 @@ from rich import print
 from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
+from rich.layout import Layout
 
 console = Console()
+layout = Layout()
 
 
 class Game:
@@ -144,7 +146,8 @@ steam_libraries_renderable = Panel(
     title="Steam Libraries",
     renderable=steam_libraries_renderable)
 
-print(Columns([default_pfx_renderable, steam_libraries_renderable], expand=True))
+# print(Columns([default_pfx_renderable,
+#      steam_libraries_renderable], expand=True, equal=True))
 # print("LibraryDATA: ", library_data)
 # print("LoginUsers: ", loginusers_data)
 
@@ -176,7 +179,7 @@ steam_games_renderable = Panel(
     title="Steam Games",
     renderable=steam_games_renderable
 )
-print(steam_games_renderable)
+# print(steam_games_renderable)
 
 non_steam_games_renderable = ""
 get_shortcuts_path("~/.local/share/Steam/userdata/")
@@ -207,7 +210,7 @@ non_steam_games_renderable = Panel(
     title="Non Steam Games",
     renderable=non_steam_games_renderable)
 
-print(non_steam_games_renderable)
+# print(non_steam_games_renderable)
 
 
 lutris_games_renderable = ""
@@ -241,6 +244,23 @@ lutris_games_renderable = Panel(
     title="Lutris Games",
     renderable=lutris_games_renderable
 )
+# print(lutris_games_renderable)
+
+
+layout.split_row(
+    Layout(name="left"),
+    Layout(name="right")
+)
+layout["left"].split_column(
+    Layout(default_pfx_renderable),
+    Layout(steam_libraries_renderable)
+)
+layout["right"].split_column(
+    Layout(steam_games_renderable),
+    Layout(non_steam_games_renderable),
+)
+layout["left"].size = 50
+print(layout)
 print(lutris_games_renderable)
 # if __name__ == "__main__":
 # app = ui.SaveManagerApp()
