@@ -6,10 +6,15 @@ import os
 import ui
 import variables
 from simple_colors import red, blue, green, yellow
+from rich import print
+from rich.columns import Columns
+from rich.console import Console
+from rich.panel import Panel
+
+console = Console()
 
 
 class Game:
-
     app_id: str
     game_name: str
     pfx_path: str
@@ -23,8 +28,11 @@ class SteamGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), f"{self.game_name} | {
-            self.app_id}", blue("pfx_path: "), self.pfx_path)
+        console.print(Panel(f"[b]Name:[/b] {self.game_name} | {
+                      self.app_id} pfx_path: {self.pfx_path}"))
+
+    def return_print(self) -> str:
+        return f"[red]Name:[/red] {self.game_name} | {self.app_id} [blue]pfx_paths:[/blue] {self.pfx_path}\n"
 
 
 class LutrisGame(Game):
@@ -36,8 +44,11 @@ class LutrisGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), self.game_name, yellow("Exe: "),
-              self.exe, blue("pfx_path"), self.pfx_path)
+        console.print(red("Name: "), self.game_name, yellow("Exe: "),
+                      self.exe, blue("pfx_path"), self.pfx_path)
+
+    def return_print(self) -> str:
+        return f"[red]Name:[/red] {self.game_name} | {self.app_id} [blue]pfx_paths:[/blue] {self.pfx_path}\n"
 
 
 class NonSteamGame(Game):
@@ -49,6 +60,10 @@ class NonSteamGame(Game):
     def print(self):
         print(red("Name: "), f"{self.game_name} | {
               self.app_id}", blue("pfx_path: "), self.pfx_path)
+
+    def return_print(self) -> str:
+        return f"[red]Name:[/red] {self.game_name} | {self.app_id} [blue]pfx_paths:[/blue] {self.pfx_path}\n"
+
 # functions
 
 
@@ -85,9 +100,10 @@ def get_pfx_paths(file, u_appid):
         path = os.path.join(file, f"steamapps/compatdata/{u_appid}")
         # print("Path: ", path)
         if os.path.exists(path):
-            # for multiple paths 
-            # pfx_paths = pfx_paths + " file://" + path
-            pfx_paths = " file://" + path
+            # for multiple paths
+            pfx_paths = pfx_paths + " file://" + path
+            # for single
+            # pfx_paths = " file://" + path
 
     return pfx_paths
 
@@ -99,25 +115,40 @@ variables.library_data = read_vdf(
 variables.loginusers_data = read_vdf(
     "~/.local/share/Steam/config/loginusers.vdf")
 
-print(green("------------- Default prefixes -------------"))
+default_pfx_renderable = Panel(
+    title="Default Prefixes",
+    renderable="[blue]Default wine prefix:[/blue] " +
+    f"file://{os.path.expanduser("~/.wine")}" +
 
-print(blue("Default wine prefix: "), f"file://{os.path.expanduser("~/.wine")}")
-print(blue("Default umu prefix: "),
-      f"file://{os.path.expanduser("~/Games/umu/umu-default/")}")
-print(blue("Default Lutris prefix: "),
-      f"file://{os.path.expanduser("~/Games/")}")
+    "\n[blue]Default umu prefix:[/blue] " +
+    f"file://{os.path.expanduser('~/Games/umu/umu-default/')}" +
 
-print(green("------------- Steam Libraries -------------"))
+    "\n[blue]Default Lutris prefix:[/blue] " +
+    f"file://{os.path.expanduser('~/Games/')}"
+)
+
+
+# print(default_pfx_renderable)
+
+
+steam_libraries_renderable = ""
 
 for key, value in variables.library_data['libraryfolders'].items():
     variables.library_folders.append(value.get('path'))
-    print(f"Library {key}: file://{value.get('path')}")
+    steam_libraries_renderable += f"[blue]Library {
+        key}:[/blue] file://{value.get('path')} \n"
+    # print(f"Library {key}: file://{value.get('path')}")
 
 
+steam_libraries_renderable = Panel(
+    title="Steam Libraries",
+    renderable=steam_libraries_renderable)
+
+print(Columns([default_pfx_renderable, steam_libraries_renderable], expand=True))
 # print("LibraryDATA: ", library_data)
 # print("LoginUsers: ", loginusers_data)
 
-print(green("------------- Steam Games -------------"))
+steam_games_renderable = ""
 
 
 # Search for app manifests in steamapps
@@ -139,10 +170,15 @@ for file in variables.library_folders:
             pfx_path = get_pfx_paths(file, appid)
             steam_game = SteamGame(appid, game_name, pfx_path)
             variables.steam_games.append(steam_game)
-            steam_game.print()
+            steam_games_renderable += steam_game.return_print()
 
-print(green("------------- Non Steam Games -------------"))
+steam_games_renderable = Panel(
+    title="Steam Games",
+    renderable=steam_games_renderable
+)
+print(steam_games_renderable)
 
+non_steam_games_renderable = ""
 get_shortcuts_path("~/.local/share/Steam/userdata/")
 
 for file in variables.shortcuts_folders:
@@ -164,10 +200,17 @@ for file in variables.shortcuts_folders:
 
         non_steam_game = NonSteamGame(appid, name, pfx_path)
         variables.non_steam_games.append(non_steam_game)
-        non_steam_game.print()
+        non_steam_games_renderable += non_steam_game.return_print()
 
 
-print(green("------------- Lutris Games -------------"))
+non_steam_games_renderable = Panel(
+    title="Non Steam Games",
+    renderable=non_steam_games_renderable)
+
+print(non_steam_games_renderable)
+
+
+lutris_games_renderable = ""
 lutris_path = os.path.expanduser("~/.local/share/lutris/games/")
 
 for yaml_file in os.listdir(lutris_path):
@@ -192,9 +235,13 @@ for yaml_file in os.listdir(lutris_path):
         lutris_game = LutrisGame(game_name, exe, pfx_path)
 
         variables.lutris_games.append(lutris_game)
-        lutris_game.print()
+        lutris_games_renderable += lutris_game.return_print()
 
-
-if __name__ == "__main__":
-    app = ui.SaveManagerApp()
-    app.run()
+lutris_games_renderable = Panel(
+    title="Lutris Games",
+    renderable=lutris_games_renderable
+)
+print(lutris_games_renderable)
+# if __name__ == "__main__":
+# app = ui.SaveManagerApp()
+# app.run()

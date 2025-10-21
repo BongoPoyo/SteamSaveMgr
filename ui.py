@@ -5,7 +5,7 @@ import os
 import re
 import variables
 from textual.containers import HorizontalGroup, VerticalScroll, VerticalGroup, Horizontal, HorizontalScroll
-from textual.widgets import Button, Placeholder, Footer, Header, Label, TabPane, TabbedContent
+from textual.widgets import Button, Placeholder, Footer, Header, Label, TabPane, TabbedContent, DirectoryTree
 import subprocess
 
 
@@ -43,6 +43,7 @@ class DefaultPrefixesView(HorizontalGroup):
 
         for key, value in variables.library_data['libraryfolders'].items():
             yield Button("Steam Library " + key, id=f"library{key}")
+            yield DirectoryTree(key)
 
 
 class SteamGameView(VerticalGroup):
@@ -52,7 +53,7 @@ class SteamGameView(VerticalGroup):
         if not button_id:
             return
 
-        print("PRESSED BUTTON ID ",button_id)
+        print("PRESSED BUTTON ID ", button_id)
 
         match = re.search(r'\d+$', button_id)
         index = 0
@@ -61,17 +62,19 @@ class SteamGameView(VerticalGroup):
 
         print("Index", index)
         path = variables.steam_games[index].pfx_path
-        
+
         subprocess.run(
             ["xdg-open", os.path.expanduser(path)], check=False)
 
     def compose(self) -> ComposeResult:
         for index, steam_game in enumerate(variables.steam_games):
             with Horizontal():
-                #yield Button(steam_game.app_id, "default", disabled=True)
+                # yield Button(steam_game.app_id, "default", disabled=True)
                 yield Label(steam_game.app_id)
                 yield Button(steam_game.game_name, id=f"SteamGame{index}", variant="primary")
             # yield Button(steam_game.game_name)
+
+
 class NonSteamGameView(VerticalGroup):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
@@ -79,7 +82,7 @@ class NonSteamGameView(VerticalGroup):
         if not button_id:
             return
 
-        print("PRESSED BUTTON ID ",button_id)
+        print("PRESSED BUTTON ID ", button_id)
 
         match = re.search(r'\d+$', button_id)
         index = 0
@@ -88,17 +91,17 @@ class NonSteamGameView(VerticalGroup):
 
         print("Index", index)
         path = variables.non_steam_games[index].pfx_path
-        
+
         subprocess.run(
             ["xdg-open", os.path.expanduser(path)], check=False)
 
     def compose(self) -> ComposeResult:
         for index, non_steam_game in enumerate(variables.non_steam_games):
             with Horizontal():
-                #yield Button(steam_game.app_id, "default", disabled=True)
+                # yield Button(steam_game.app_id, "default", disabled=True)
                 yield Label(non_steam_game.app_id)
                 yield Button(non_steam_game.game_name, id=f"NonSteamGame{index}", variant="primary")
- 
+
 
 class SaveManagerApp(App):
     CSS_PATH = "ui.css"
