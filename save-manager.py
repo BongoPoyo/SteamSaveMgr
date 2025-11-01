@@ -23,8 +23,7 @@ class SteamGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), f"{self.game_name} | {
-            self.app_id}", blue("pfx_path: "), self.pfx_path)
+        print(red("Name: "), f"{self.game_name} | {self.app_id}", blue("pfx_path: "), self.pfx_path)
 
 
 class LutrisGame(Game):
@@ -47,8 +46,7 @@ class NonSteamGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), f"{self.game_name} | {
-              self.app_id}", blue("pfx_path: "), self.pfx_path)
+        print(red("Name: "), f"{self.game_name} | {self.app_id}", blue("pfx_path: "), self.pfx_path)
 # functions
 
 
@@ -101,11 +99,11 @@ variables.loginusers_data = read_vdf(
 
 print(green("------------- Default prefixes -------------"))
 
-print(blue("Default wine prefix: "), f"file://{os.path.expanduser("~/.wine")}")
+print(blue("Default wine prefix: "), f"file://{os.path.expanduser('~/.wine')}")
 print(blue("Default umu prefix: "),
-      f"file://{os.path.expanduser("~/Games/umu/umu-default/")}")
+      f"file://{os.path.expanduser('~/Games/umu/umu-default/')}")
 print(blue("Default Lutris prefix: "),
-      f"file://{os.path.expanduser("~/Games/")}")
+      f"file://{os.path.expanduser('~/Games/')}")
 
 print(green("------------- Steam Libraries -------------"))
 
@@ -180,12 +178,11 @@ for yaml_file in os.listdir(lutris_path):
 
         # regular expression to remove dash and numbers
         game_name = re.sub(r'-\d+$', '', stem)
-        exe = f"file://{yaml_data.get("game", {}).get("exe", "")}"
+        exe = f"file://{yaml_data.get('game', {}).get('exe', '')}"
         if exe == "file://":
             exe = ""
 
-        pfx_path = f"file://{yaml_data.get("game", {}).get(
-            "prefix", "")}"
+        pfx_path = f"file://{yaml_data.get('game', {}).get( 'prefix', '')}"
         if pfx_path == "file://":
             pfx_path = ""
 
