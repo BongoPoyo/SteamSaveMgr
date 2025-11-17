@@ -6,6 +6,8 @@ A pfx manager for wine, lutris, umu and steam(proton).
 2. Steam games.
 3. Non steam games added to steam.
 
+### Screenshot
+![Screenshot](screenshot.png) 
 It just prints the pfx location
 
 

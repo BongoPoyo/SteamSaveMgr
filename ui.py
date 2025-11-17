@@ -1,146 +1,63 @@
-from textual.reactive import reactive
-from time import monotonic
 from textual.app import App, ComposeResult
-import os
-import re
+from textual.widgets import Header, Footer, Static, Tree
+from textual.containers import Horizontal, Vertical
+
+# Assuming you have lists in variables: steam_games, non_steam_games, lutris_games
 import variables
-from textual.containers import HorizontalGroup, VerticalScroll, VerticalGroup, Horizontal, HorizontalScroll
-from textual.widgets import Button, Placeholder, Footer, Header, Label, TabPane, TabbedContent
 import subprocess
 
 
-class DefaultPrefixesView(HorizontalGroup):
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.button.id
-
-        if not button_id:
-            return
-
-        if button_id == "def_wine_pfx":
-            subprocess.run(
-                ["xdg-open", os.path.expanduser("~/.wine")], check=False)
-        elif button_id == "def_umu_pfx":
-            subprocess.run(
-                ["xdg-open", os.path.expanduser("~/Games/umu/umu-default/")], check=False)
-        elif button_id == "def_lutris_pfx":
-            subprocess.run(
-                ["xdg-open", os.path.expanduser("~/Games/")], check=False)
-        elif button_id.__contains__("library"):
-            match = re.search(r'\d+$', button_id)  # find digits at end
-            num = 0
-            if match:
-                num = int(match.group())  # → 0
-
-            path = variables.library_folders[num]
-            subprocess.run(
-                ["xdg-open", os.path.expanduser(path)], check=False)
-
+class GameTree(Static):
     def compose(self) -> ComposeResult:
-        yield Button("Default Wine Prefix", id="def_wine_pfx")
-        yield Button("Open Umu prefix", id="def_umu_pfx")
-        yield Button("Open Lutris prefix", id="def_lutris_pfx")
+        tree = Tree("Games")
 
-        for key, value in variables.library_data['libraryfolders'].items():
-            yield Button("Steam Library " + key, id=f"library{key}")
+        steam_branch = tree.root.add("Steam Games")
+        for g in variables.steam_games:
+            game = steam_branch.add(f"{g.game_name} ({g.app_id})")
+            leaf = game.add_leaf(g.pfx_path)
+
+        nonsteam_branch = tree.root.add("Non‑Steam Games")
+        for g in variables.non_steam_games:
+            game = nonsteam_branch.add(f"{g.game_name} ({g.app_id})")
+            leaf = game.add_leaf(g.pfx_path)
+
+        lutris_branch = tree.root.add("Lutris Games")
+        for g in variables.lutris_games:
+            game = lutris_branch.add(f"{g.game_name}")
+            leaf = game.add_leaf(g.pfx_path)
+
+        yield tree
 
 
-class SteamGameView(VerticalGroup):
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.button.id
+class GameUI(App):
+    CSS = """
+    Screen {
+        layout: horizontal;
+    }
 
-        if not button_id:
-            return
-
-        print("PRESSED BUTTON ID ",button_id)
-
-        match = re.search(r'\d+$', button_id)
-        index = 0
-        if match:
-            index = int(match.group())
-
-        print("Index", index)
-        path = variables.steam_games[index].pfx_path
-        
-        subprocess.run(
-            ["xdg-open", os.path.expanduser(path)], check=False)
-
-    def compose(self) -> ComposeResult:
-        for index, steam_game in enumerate(variables.steam_games):
-            with Horizontal():
-                #yield Button(steam_game.app_id, "default", disabled=True)
-                yield Label(steam_game.app_id)
-                yield Button(steam_game.game_name, id=f"SteamGame{index}", variant="primary")
-            # yield Button(steam_game.game_name)
-class NonSteamGameView(VerticalGroup):
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.button.id
-
-        if not button_id:
-            return
-
-        print("PRESSED BUTTON ID ",button_id)
-
-        match = re.search(r'\d+$', button_id)
-        index = 0
-        if match:
-            index = int(match.group())
-
-        print("Index", index)
-        path = variables.non_steam_games[index].pfx_path
-        
-        subprocess.run(
-            ["xdg-open", os.path.expanduser(path)], check=False)
-
-    def compose(self) -> ComposeResult:
-        for index, non_steam_game in enumerate(variables.non_steam_games):
-            with Horizontal():
-                #yield Button(steam_game.app_id, "default", disabled=True)
-                yield Label(non_steam_game.app_id)
-                yield Button(non_steam_game.game_name, id=f"NonSteamGame{index}", variant="primary")
- 
-
-class SaveManagerApp(App):
-    CSS_PATH = "ui.css"
-
-    BINDINGS = [("q", "quit", "Quit app"),
-                ("1", "default_tab", "Default Tab"),
-                ("2", "steam_tab", "Steam Tab"),
-                ("3", "non_steam_tab", "Non Steam Tab"),
-                ("4", "lutris_tab", "Lutris Tab"),
-                ]
+    # Left panel
+    # Right panel
+    """
+    BINDINGS = [("q", "quit", "Quit app")]
 
     def compose(self) -> ComposeResult:
         yield Header()
+        yield Horizontal(
+            Vertical(
+                Static("Defaults", id="title"),
+                Static(variables.default_pfx_renderable, id="pfx"),
+                Static(variables.steam_library_renderable, id="library"),
+            ),
+            Vertical(
+                GameTree(),
+            ),
+        )
+
+        def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
+            label = event.node.label
+            # Extract path from label if appended
+            if "::" in label:
+                name, path = label.split("::", 1)
+                subprocess.Popen(["xdg-open", path])
+
         yield Footer()
-
-        with TabbedContent():
-            with TabPane("Default", id="default_tab"):
-                yield VerticalScroll(DefaultPrefixesView())
-            with TabPane("SteamGames", id="steam_tab"):
-                yield VerticalScroll(SteamGameView())
-            with TabPane("NonSteamGames", id="non_steam_tab"):
-                yield VerticalScroll(NonSteamGameView())
-            with TabPane("LutrisGames", id="lutris_tab"):
-                yield VerticalScroll()
-
-    # Tab Switching
-    def action_default_tab(self) -> None:
-        self.query_one(TabbedContent).active = "default_tab"
-
-    def action_steam_tab(self) -> None:
-        self.query_one(TabbedContent).active = "steam_tab"
-
-    def action_non_steam_tab(self) -> None:
-        self.query_one(TabbedContent).active = "non_steam_tab"
-
-    def action_lutris_tab(self) -> None:
-        self.query_one(TabbedContent).active = "lutris_tab"
-
-    def on_mount(self) -> None:
-        self.title = "SaveManager"
-
-
-# if __name__ == "__main__":
-#     app = SaveManagerApp()
-#     app.run()
