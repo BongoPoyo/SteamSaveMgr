@@ -18,12 +18,12 @@ class GameTree(Static):
 
         nonsteam_branch = tree.root.add("Non‑Steam Games")
         for g in variables.non_steam_games:
-            game = nonsteam_branch.add_leaf(f"{g.game_name} ({g.app_id})")
+            game = nonsteam_branch.add(f"{g.game_name} ({g.app_id})")
             leaf = game.add_leaf(g.pfx_path)
 
         lutris_branch = tree.root.add("Lutris Games")
         for g in variables.lutris_games:
-            game = lutris_branch.add_leaf(f"{g.game_name}")
+            game = lutris_branch.add(f"{g.game_name}")
             leaf = game.add_leaf(g.pfx_path)
 
         yield tree
@@ -44,8 +44,9 @@ class GameUI(App):
         yield Header()
         yield Horizontal(
             Vertical(
-                Static("Default Prefixes", id="pfx_title"),
+                Static("Defaults", id="title"),
                 Static(variables.default_pfx_renderable, id="pfx"),
+                Static(variables.steam_library_renderable, id="library"),
             ),
             Vertical(
                 GameTree(),

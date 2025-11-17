@@ -254,7 +254,7 @@ for yaml_file in os.listdir(lutris_path):
 variables.lutris_game_renderable = lutris_games_renderable
 variables.default_pfx_renderable = default_pfx_renderable
 variables.steam_game_renderable = steam_games_renderable
-
+variables.steam_library_renderable = steam_libraries_renderable
 lutris_games_renderable = Panel(
     title="Lutris Games", renderable=lutris_games_renderable
 )
