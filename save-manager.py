@@ -30,7 +30,15 @@ class SteamGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), f"{self.game_name} | {self.app_id}", blue("pfx_path: "), self.pfx_path)
+        print(
+            red("Name: "),
+            f"{self.game_name} | {self.app_id}",
+            blue("pfx_path: "),
+            self.pfx_path,
+        )
+
+    def return_print(self) -> str:
+        return f"[red]Name:[/red] {self.game_name} | {self.app_id} [blue]pfx_paths:[/blue] {self.pfx_path}\n"
 
 
 class LutrisGame(Game):
@@ -62,7 +70,17 @@ class NonSteamGame(Game):
         self.pfx_path = pfx_path
 
     def print(self):
-        print(red("Name: "), f"{self.game_name} | {self.app_id}", blue("pfx_path: "), self.pfx_path)
+        print(
+            red("Name: "),
+            f"{self.game_name} | {self.app_id}",
+            blue("pfx_path: "),
+            self.pfx_path,
+        )
+
+    def return_print(self) -> str:
+        return f"[red]Name:[/red] {self.game_name} | {self.app_id} [blue]pfx_paths:[/blue] {self.pfx_path}\n"
+
+
 # functions
 
 
@@ -124,10 +142,11 @@ default_pfx_renderable = Panel(
 )
 
 print(blue("Default wine prefix: "), f"file://{os.path.expanduser('~/.wine')}")
-print(blue("Default umu prefix: "),
-      f"file://{os.path.expanduser('~/Games/umu/umu-default/')}")
-print(blue("Default Lutris prefix: "),
-      f"file://{os.path.expanduser('~/Games/')}")
+print(
+    blue("Default umu prefix: "),
+    f"file://{os.path.expanduser('~/Games/umu/umu-default/')}",
+)
+print(blue("Default Lutris prefix: "), f"file://{os.path.expanduser('~/Games/')}")
 
 # print(default_pfx_renderable)
 
@@ -222,12 +241,12 @@ for yaml_file in os.listdir(lutris_path):
         stem = Path(yaml_file).stem
 
         # regular expression to remove dash and numbers
-        game_name = re.sub(r'-\d+$', '', stem)
+        game_name = re.sub(r"-\d+$", "", stem)
         exe = f"file://{yaml_data.get('game', {}).get('exe', '')}"
         if exe == "file://":
             exe = ""
 
-        pfx_path = f"file://{yaml_data.get('game', {}).get( 'prefix', '')}"
+        pfx_path = f"file://{yaml_data.get('game', {}).get('prefix', '')}"
         if pfx_path == "file://":
             pfx_path = ""
 

@@ -22,6 +22,7 @@ wget https://github.com/BongoPoyo/SteamSaveMgr/releases/latest/download/save-man
 chmod +x save-manager
 sudo mv save-manager /usr/local/bin/save-manager
 ```
+Press shift + click to open the pfx_location.
 
 # Uninstallation
 
