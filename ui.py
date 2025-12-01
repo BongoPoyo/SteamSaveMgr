@@ -1,10 +1,14 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Static, Tree
+from textual.widgets import Header, Footer, Static, Tree, DataTable
 from textual.containers import Horizontal, Vertical
 
 import variables
 import subprocess
 import os
+
+ROWS = [
+    ("Number", "GameType", "GameName", "AppID", "PFX"),
+]
 
 
 class GameTree(Static):
@@ -51,21 +55,14 @@ class GameUI(App):
     Screen {
         layout: horizontal;
     }
-
-    # Left panel
-    # Right panel
     """
     BINDINGS = [("q", "quit", "Quit app")]
-
-    def on_mount(self) -> None:
-        self.theme = "catppuccin-mocha"
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield Horizontal(
-
             Vertical(
-                GameTree(),
+                DataTable(),
             ),
         )
 
@@ -77,3 +74,34 @@ class GameUI(App):
                 subprocess.Popen(["xdg-open", path])
 
         yield Footer()
+
+    def on_mount(self) -> None:
+        self.theme = "catppuccin-mocha"
+        table = self.query_one(DataTable)
+
+        i = 1
+        for g in variables.steam_games:
+            ROWS.append(
+                (i, "Steam", g.game_name, g.app_id, g.pfx_path)
+            )
+            i += 1
+
+        for g in variables.non_steam_games:
+            ROWS.append(
+                (i, "NonSteam", g.game_name, g.app_id, g.pfx_path)
+            )
+            i += 1
+        for g in variables.lutris_games:
+            ROWS.append(
+                (i, "Lutris", g.game_name, g.app_id, g.pfx_path)
+            )
+            i += 1
+        table.add_columns(*ROWS[0])
+        table.add_rows(ROWS[1:])
+
+    def on_data_table_cell_selected(self, event: DataTable.CellSelected) -> None:
+        row_index = event.coordinate.row
+        column_index = event.coordinate.column
+        # we add one because of heading, 4 is the pfx column
+        path = ROWS[row_index + 1][4]
+        subprocess.Popen(["xdg-open", path])

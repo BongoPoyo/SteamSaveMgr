@@ -128,8 +128,10 @@ def get_pfx_paths(file, u_appid):
 # MAIN
 
 
-variables.library_data = read_vdf("~/.local/share/Steam/config/libraryfolders.vdf")
-variables.loginusers_data = read_vdf("~/.local/share/Steam/config/loginusers.vdf")
+variables.library_data = read_vdf(
+    "~/.local/share/Steam/config/libraryfolders.vdf")
+variables.loginusers_data = read_vdf(
+    "~/.local/share/Steam/config/loginusers.vdf")
 
 default_pfx_renderable = Panel(
     title="Default Prefixes",
@@ -141,12 +143,6 @@ default_pfx_renderable = Panel(
     + f"file://{os.path.expanduser('~/Games/')}",
 )
 
-print(blue("Default wine prefix: "), f"file://{os.path.expanduser('~/.wine')}")
-print(
-    blue("Default umu prefix: "),
-    f"file://{os.path.expanduser('~/Games/umu/umu-default/')}",
-)
-print(blue("Default Lutris prefix: "), f"file://{os.path.expanduser('~/Games/')}")
 
 # print(default_pfx_renderable)
 
@@ -194,7 +190,8 @@ for file in variables.library_folders:
             variables.steam_games.append(steam_game)
             steam_games_renderable += steam_game.return_print()
 
-steam_games_renderable = Panel(title="Steam Games", renderable=steam_games_renderable)
+steam_games_renderable = Panel(
+    title="Steam Games", renderable=steam_games_renderable)
 # print(steam_games_renderable)
 
 non_steam_games_renderable = ""
