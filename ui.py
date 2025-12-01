@@ -46,24 +46,6 @@ class GameTree(Static):
         yield tree
 
 
-class DefaultPfxTree(Static):
-    def compose(self) -> ComposeResult:
-        pfx_tree = Tree("Defaults")
-
-        wine_branch = pfx_tree.root.add("Wine prefix")
-        wine_branch.add_leaf(f"file://{os.path.expanduser('~/.wine')}")
-
-        lutris_branch = pfx_tree.root.add("Lutris prefix")
-        lutris_branch.add_leaf(
-            f"file://{os.path.expanduser('~/Games/')}")
-
-        umu_branch = pfx_tree.root.add("Umu prefix")
-        umu_branch.add_leaf(
-            f"file://{os.path.expanduser('~/Games/umu/umu-default/')}")
-
-        yield pfx_tree
-
-
 class GameUI(App):
     CSS = """
     Screen {
