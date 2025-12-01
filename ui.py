@@ -75,6 +75,9 @@ class GameUI(App):
     """
     BINDINGS = [("q", "quit", "Quit app")]
 
+    def on_mount(self) -> None:
+        self.theme = "catppuccin-mocha"
+
     def compose(self) -> ComposeResult:
         yield Header()
         yield Horizontal(
