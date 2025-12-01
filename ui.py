@@ -2,31 +2,66 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Tree
 from textual.containers import Horizontal, Vertical
 
-# Assuming you have lists in variables: steam_games, non_steam_games, lutris_games
 import variables
 import subprocess
+import os
 
 
 class GameTree(Static):
     def compose(self) -> ComposeResult:
-        tree = Tree("Games")
+        tree = Tree("Tree")
 
-        steam_branch = tree.root.add("Steam Games")
+        # pfx
+        pfx_tree = tree.root.add("Defaults")
+
+        wine_branch = pfx_tree.add("Wine prefix")
+        wine_branch.add_leaf(f"file://{os.path.expanduser('~/.wine')}")
+
+        lutris_branch = pfx_tree.add("Lutris prefix")
+        lutris_branch.add_leaf(
+            f"file://{os.path.expanduser('~/Games/')}")
+
+        umu_branch = pfx_tree.add("Umu prefix")
+        umu_branch.add_leaf(
+            f"file://{os.path.expanduser('~/Games/umu/umu-default/')}")
+
+        # games
+        game_tree = tree.root.add("Games")
+
+        steam_branch = game_tree.add("Steam Games")
         for g in variables.steam_games:
             game = steam_branch.add(f"{g.game_name} ({g.app_id})")
-            leaf = game.add_leaf(g.pfx_path)
+            game.add_leaf(g.pfx_path)
 
-        nonsteam_branch = tree.root.add("Non‑Steam Games")
+        nonsteam_branch = game_tree.add("Non‑Steam Games")
         for g in variables.non_steam_games:
             game = nonsteam_branch.add(f"{g.game_name} ({g.app_id})")
-            leaf = game.add_leaf(g.pfx_path)
+            game.add_leaf(g.pfx_path)
 
-        lutris_branch = tree.root.add("Lutris Games")
+        lutris_branch = game_tree.add("Lutris Games")
         for g in variables.lutris_games:
             game = lutris_branch.add(f"{g.game_name}")
-            leaf = game.add_leaf(g.pfx_path)
+            game.add_leaf(g.pfx_path)
 
         yield tree
+
+
+class DefaultPfxTree(Static):
+    def compose(self) -> ComposeResult:
+        pfx_tree = Tree("Defaults")
+
+        wine_branch = pfx_tree.root.add("Wine prefix")
+        wine_branch.add_leaf(f"file://{os.path.expanduser('~/.wine')}")
+
+        lutris_branch = pfx_tree.root.add("Lutris prefix")
+        lutris_branch.add_leaf(
+            f"file://{os.path.expanduser('~/Games/')}")
+
+        umu_branch = pfx_tree.root.add("Umu prefix")
+        umu_branch.add_leaf(
+            f"file://{os.path.expanduser('~/Games/umu/umu-default/')}")
+
+        yield pfx_tree
 
 
 class GameUI(App):
@@ -43,11 +78,7 @@ class GameUI(App):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Horizontal(
-            Vertical(
-                Static("Defaults", id="title"),
-                Static(variables.default_pfx_renderable, id="pfx"),
-                Static(variables.steam_library_renderable, id="library"),
-            ),
+
             Vertical(
                 GameTree(),
             ),
