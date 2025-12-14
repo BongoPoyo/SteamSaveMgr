@@ -78,24 +78,34 @@ class GameUI(App):
     def on_mount(self) -> None:
         self.theme = "catppuccin-mocha"
         table = self.query_one(DataTable)
-
-        i = 1
+        rows_append_default_pfx()
+        i = 3
+        j = 0
+        for l in variables.library_folders:
+            ROWS.append((
+                i, "Steam Library", j, "None", f" file://{l}"
+            ))
+            i += 1
+            j += 1
+        ROWS.append(())
         for g in variables.steam_games:
             ROWS.append(
                 (i, "Steam", g.game_name, g.app_id, g.pfx_path)
             )
             i += 1
-
+        ROWS.append(())
         for g in variables.non_steam_games:
             ROWS.append(
                 (i, "NonSteam", g.game_name, g.app_id, g.pfx_path)
             )
             i += 1
+        ROWS.append(())
         for g in variables.lutris_games:
             ROWS.append(
                 (i, "Lutris", g.game_name, g.app_id, g.pfx_path)
             )
             i += 1
+        ROWS.append(())
         table.add_columns(*ROWS[0])
         table.add_rows(ROWS[1:])
 
@@ -105,3 +115,13 @@ class GameUI(App):
         # we add one because of heading, 4 is the pfx column
         path = ROWS[row_index + 1][4]
         subprocess.Popen(["xdg-open", path])
+
+
+def rows_append_default_pfx():
+    ROWS.append((0, "Default", "Wine prefix",
+                "None", " file:///home/bongo/.wine"))
+    ROWS.append((1, "Default", "UMU prefix", "None",
+                " file:///home/bongo/Games/umu/umu-default/"))
+    ROWS.append((2, "Default", "Lutris prefix",
+                "None", " file:///home/bongo/Games"))
+    ROWS.append(())
